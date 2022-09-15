@@ -1,0 +1,16 @@
+# CONFIG
+.env
+config.json
+
+# Folders
+build/
+.vscode/
+.vs/
+
+# Others
+*.expand
+*.bin
+*.o
+*.d
+*.a
+*.iso

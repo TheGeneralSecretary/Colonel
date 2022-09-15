@@ -1,10 +1,20 @@
-extern "C"
-{
+#include <Kernel/Drivers/VGA.h>
+#include <Kernel/KPrintf.h>
+#include <Kernel/KPanic.h>
 
-void KMain()
+namespace Kernel
 {
-	int x = 10;
-	(void)x;
+	void InitKernel()
+	{
+		if (Drivers::VGA::Init() < 0)
+			KPanic("Failed To Initialize VGA Driver");
+	}
 }
 
+extern "C"
+{
+	void KMain()
+	{
+		Kernel::InitKernel();
+	}
 }

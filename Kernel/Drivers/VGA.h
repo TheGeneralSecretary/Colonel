@@ -57,9 +57,9 @@ namespace Kernel
 			static void ScrollDown();
 
 		private:
-			static uint16_t* m_VideoAddress;
-			static uint16_t m_Col, m_Row;
-			static VGAColor m_Color;
+			static uint16_t* s_VideoAddress;
+			static uint16_t s_Col, s_Row;
+			static VGAColor s_Color;
 		};
 	}
 }

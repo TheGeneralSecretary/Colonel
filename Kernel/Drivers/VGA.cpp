@@ -10,17 +10,17 @@ namespace Kernel
 {
 	namespace Drivers
 	{
-		uint16_t* VGA::m_VideoAddress = nullptr;
-		uint16_t VGA::m_Col = 0;
-		uint16_t VGA::m_Row = 0;
-		VGAColor VGA::m_Color = VGAColor::White;
+		uint16_t* VGA::s_VideoAddress = nullptr;
+		uint16_t VGA::s_Col = 0;
+		uint16_t VGA::s_Row = 0;
+		VGAColor VGA::s_Color = VGAColor::White;
 
 		int32_t VGA::Init()
 		{
-			m_VideoAddress = (uint16_t*)0xB8000;
-			m_Col = 0;
-			m_Row = 0;
-			m_Color = VGAColor::White;
+			s_VideoAddress = (uint16_t*)0xB8000;
+			s_Col = 0;
+			s_Row = 0;
+			s_Color = VGAColor::White;
 			Clear();
 			KPrintf("Initializing VGA Driver...\n");
 			return 0;
@@ -30,37 +30,37 @@ namespace Kernel
 		{
 			for (uint16_t y = 0; y < VGA_HEIGHT; y++)
 				for (uint16_t x = 0; x < VGA_WIDTH; x++)
-					PutCharLocation(x, y, ' ', m_Color);
+					PutCharLocation(x, y, ' ', s_Color);
 			SetCursor(0);
 		}
 
 		void VGA::PutChar(uint8_t ch)
 		{
-			PutCharColor(ch, m_Color);
+			PutCharColor(ch, s_Color);
 		}
 
 		void VGA::PutCharColor(uint8_t ch, VGAColor color)
 		{
-			if (m_Row >= VGA_HEIGHT)
+			if (s_Row >= VGA_HEIGHT)
 				ScrollDown();
 
 			if (ch == '\n')
 			{
-				m_Col = 0;
-				m_Row += 1;
+				s_Col = 0;
+				s_Row += 1;
 				return;
 			}
 
-			PutCharLocation(m_Col, m_Row, ch, color);
-			m_Col += 1;
+			PutCharLocation(s_Col, s_Row, ch, color);
+			s_Col += 1;
 
-			if (m_Col >= VGA_WIDTH)
+			if (s_Col >= VGA_WIDTH)
 			{
-				m_Col = 0;
-				m_Row += 1;
+				s_Col = 0;
+				s_Row += 1;
 			}
 
-			SetCursor(VGA_GET_OFFSET(m_Col, m_Row));
+			SetCursor(VGA_GET_OFFSET(s_Col, s_Row));
 		}
 
 		void VGA::PutStr(const char* str)
@@ -71,12 +71,12 @@ namespace Kernel
 
 		VGAColor VGA::GetColor()
 		{
-			return m_Color;
+			return s_Color;
 		}
 
 		void VGA::SetColor(VGAColor color)
 		{
-			m_Color = color;
+			s_Color = color;
 		}
 
 		void VGA::EnableCursor(uint8_t start, uint8_t end)
@@ -114,17 +114,17 @@ namespace Kernel
 
 		void VGA::PutCharLocation(uint16_t col, uint16_t row, uint8_t ch, VGAColor color)
 		{
-			m_VideoAddress[(row * VGA_WIDTH) + col] = VGA_ENCODE(ch, (uint8_t)color);
+			s_VideoAddress[(row * VGA_WIDTH) + col] = VGA_ENCODE(ch, (uint8_t)color);
 		}
 
 		void VGA::ScrollDown()
 		{
-			uint8_t* start = (uint8_t*)m_VideoAddress + VGA_WIDTH * 2;
-			uint32_t size = m_Row * VGA_WIDTH * 2;
-			memcpy(m_VideoAddress, start, size);
-			start = (uint8_t*)m_VideoAddress + size;
+			uint8_t* start = (uint8_t*)s_VideoAddress + VGA_WIDTH * 2;
+			uint32_t size = s_Row * VGA_WIDTH * 2;
+			memcpy(s_VideoAddress, start, size);
+			start = (uint8_t*)s_VideoAddress + size;
 			memsetw(start, VGA_ENCODE(' ', (uint8_t)VGAColor::Black), size);
-			m_Row--;
+			s_Row--;
 		}
 	}
 }
